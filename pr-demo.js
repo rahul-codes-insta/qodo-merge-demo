@@ -3,75 +3,114 @@
 // Trigger Qodo Merge review
 // /review
 
-// 1. Inconsistent imports (spaces vs. no-spaces), var vs. let/const
+// 1. Inconsistent imports & requires
 import   fs from 'fs'
 var path=require('path');
+import os from "os"; const { spawn } = require('child_process')
 
-const RAW_DATA = [1, 2, 3, 4];
-
-// 2. Mixed indentation (tabs & spaces), mismatched braces
+// 2. Mixed indentation, brace styles, stray semicolons
 function processData(data) {
-  if(data.length > 0){
-    let result = data.map((item) => {
-    return item * 2 }) 
-      ;  // stray semicolon
+  if(data.length>0) {
+    let result=data
+      .map(item=>{return item*2})
+       ;// stray semicolon
    return result
   }
-  else
-  {
-      return []
+else {return []}
+}
+
+// 3. Deeply nested callbacks & parameter reassignment
+function deepNest(a, callback) {
+  fs.readFile('input.json', 'utf8', function(err, raw){
+    if(err) throw err
+    let obj = JSON.parse(raw)
+    obj.value = a + obj.value  // parameter mutation
+    fetchData(function(text){
+          parse(text, function(parsed){
+             transform(parsed, function(final){
+                  callback(final)
+             })
+          })
+    })
+  })
+}
+
+// 4. eval usage & global variable leak
+function doEval(str) {
+  eval(str)  // dangerous!
+}
+global.leak = "oops"
+
+// 5. Magic numbers & hardcoded paths
+const TIMEOUT = 5000; // why 5 seconds?
+setTimeout(()=> console.log("Done"), TIMEOUT)
+const CONFIG_PATH = "/etc/app/config.json"
+
+// 6. Try/catch swallowing errors
+function risky() {
+  try { 
+    nonexistentFunction();
+  } catch(e) {
+    // silently ignore
   }
 }
 
-// 3. Outdated callback pattern instead of Promise/async
-function readAndProcess(filename, callback) {
-  fs.readFile(filename, 'utf8', function(err, content) {
-    if (err) throw err
-     const parsed = JSON.parse(content);
-     callback(parsed);
-  })
-}
-
-// 4. Unclear variable names, inconsistent spacing
-readAndProcess(path.join(__dirname, 'input.json'), function(d){
- let x=processData(d)
-console.log("Processed:",x)
-});
-
-// 5. Unused function with terrible naming
-function doStuff1(){console.log("doing stuff!")}
-
-// 6. New: mixing ES modules & CommonJS, dynamic require
-import os from 'os';
-const version = require('child_process').execSync('node -v');
-
-// 7. New: an old-style Promise with no catch
-function oldPromiseStyle(){
-    return new Promise((resolve, reject)=>{
-resolve("ok")
-})
-}
-
-// 8. New: a callback-based fetchData plus an unused var
+// 7. Duplicate function names
 function fetchData(cb){
-  fs.readFile('data.txt', 'utf-8', (err, data) => {
-    if(err){
-      console.error("Error!", err)
-      return
-    }
-    cb(data)
-  })
+  fs.readFile('data.txt','utf8',(e,d)=>{if(e) return; cb(d)})
 }
-let unusedVar = 42
-
-// 9. New: C-style for loop with var
-for(var i=0;i<3;i++){
-    console.log("Loop index:",i)
+function fetchData(url, cb){  // overload that never gets called
+  // pretend to fetch over network
+  cb("fetched:"+url)
 }
 
-// 10. New: inconsistent trailing commas, semicolons & quotes
-const numbers = [1, 2, 3, 4,];
-const message = "Hello" + ' World';
+// 8. Inconsistent variable scopes & missing declarations
+for(i=0;i<3;i++){  // i is global
+   console.log(i)
+}
+if (true) {
+  let hidden = "secret";
+}
+console.log(hidden)  // ReferenceError
 
-// 11. Mixed export syntax
-module.exports = {processData, readAndProcess, fetchData, oldPromiseStyle};
+// 9. Mixed string quotes & template vs concatenation
+const greeting = "Hello " + 'World'
+const info = `User: ${process.env.USER}`
+
+// 10. Unused imports & variables
+import unused from 'unused-module';
+const temp = 12345;
+
+// 11. Mixed export styles
+export { processData };
+module.exports.deepNest = deepNest;
+
+// 12. Callback + Promise misuse
+function combo(cb) {
+  return new Promise(resolve => {
+    cb("data");
+    resolve("done");
+  });
+}
+
+// 13. Spaghetti switch with fallthrough
+function getType(x) {
+  switch(typeof x) {
+    case 'string':
+    case 'number':
+      return x;
+    case 'object':
+      // no break
+    default:
+      return null;
+  }
+}
+
+// 14. Anonymous IIFE and leftover debugger
+(function(){
+    debugger;
+    console.log("IIFE ran");
+})();
+
+// 15. Unnecessary semicolons and commas
+;;;,
