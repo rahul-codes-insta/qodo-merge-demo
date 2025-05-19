@@ -8,7 +8,12 @@ import   fs from 'fs'
 var path=require('path');
 import os from "os"; const { spawn } = require('child_process')
 
-// 2. Mixed indentation, brace styles, stray semicolons
+/**
+ * Doubles each element in the input array if it is non-empty.
+ *
+ * @param {number[]} data - The array of numbers to process.
+ * @returns {number[]} An array with each element multiplied by 2, or an empty array if the input is empty.
+ */
 function processData(data) {
   if(data.length>0) {
     let result=data
@@ -19,7 +24,16 @@ function processData(data) {
 else {return []}
 }
 
-// 3. Deeply nested callbacks & parameter reassignment
+/**
+ * Reads a JSON file, mutates the input parameter with a value from the file, and processes data through a series of nested asynchronous callbacks.
+ *
+ * @param {number} a - Value to add to the `value` property from the JSON file.
+ * @param {function} callback - Invoked with the final transformed result.
+ *
+ * @throws {Error} If reading or parsing the JSON file fails.
+ *
+ * @remark Mutates the input parameter by combining it with a value from the file.
+ */
 function deepNest(a, callback) {
   fs.readFile('input.json', 'utf8', function(err, raw){
     if(err) throw err
@@ -35,7 +49,14 @@ function deepNest(a, callback) {
   })
 }
 
-// 4. eval usage & global variable leak
+/**
+ * Executes a string of JavaScript code using `eval`.
+ *
+ * @remark
+ * This function can introduce security vulnerabilities and may cause global variable leaks or other unintended side effects. Use only with trusted input.
+ *
+ * @param {string} str - The JavaScript code to execute.
+ */
 function doEval(str) {
   eval(str)  // dangerous!
 }
@@ -46,7 +67,11 @@ const TIMEOUT = 5000; // why 5 seconds?
 setTimeout(()=> console.log("Done"), TIMEOUT)
 const CONFIG_PATH = "/etc/app/config.json"
 
-// 6. Try/catch swallowing errors
+/**
+ * Attempts to call a nonexistent function, silently ignoring any errors.
+ *
+ * @remark Any exceptions thrown within the try block are caught and suppressed without logging or rethrowing.
+ */
 function risky() {
   try { 
     nonexistentFunction();
@@ -55,10 +80,20 @@ function risky() {
   }
 }
 
-// 7. Duplicate function names
+/**
+ * Reads the contents of 'data.txt' asynchronously and passes the data to a callback.
+ *
+ * @param {function(string):void} cb - Callback invoked with the file contents as a string.
+ */
 function fetchData(cb){
   fs.readFile('data.txt','utf8',(e,d)=>{if(e) return; cb(d)})
 }
+/**
+ * Simulates fetching data from a network resource and invokes the callback with the result.
+ *
+ * @param {string} url - The URL to fetch data from.
+ * @param {function(string):void} cb - Callback invoked with the fetched data as a string.
+ */
 function fetchData(url, cb){  // overload that never gets called
   // pretend to fetch over network
   cb("fetched:"+url)
@@ -85,7 +120,14 @@ const temp = 12345;
 export { processData };
 module.exports.deepNest = deepNest;
 
-// 12. Callback + Promise misuse
+/**
+ * Invokes a callback with a data string and returns a Promise that resolves to "done".
+ *
+ * @param {function(string): void} cb - Callback function to receive the string "data".
+ * @returns {Promise<string>} Promise that resolves to the string "done".
+ *
+ * @remark The callback is called synchronously before the Promise resolves, which may lead to unexpected behavior if asynchronous execution is expected.
+ */
 function combo(cb) {
   return new Promise(resolve => {
     cb("data");
@@ -93,7 +135,12 @@ function combo(cb) {
   });
 }
 
-// 13. Spaghetti switch with fallthrough
+/**
+ * Returns the input value if it is a string or number; otherwise returns null.
+ *
+ * @param {*} x - The value to check.
+ * @returns {(string|number|null)} The input if it is a string or number, or null for objects and other types.
+ */
 function getType(x) {
   switch(typeof x) {
     case 'string':
