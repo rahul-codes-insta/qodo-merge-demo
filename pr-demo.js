@@ -1,3 +1,7 @@
+// messy-pr-demo.js
+
+// Trigger Qodo Merge review
+// /review
 
 // 1. Inconsistent imports (spaces vs. no-spaces), var vs. let/const
 import   fs from 'fs'
@@ -34,8 +38,40 @@ readAndProcess(path.join(__dirname, 'input.json'), function(d){
 console.log("Processed:",x)
 });
 
-// 5. Unused function with bad naming
+// 5. Unused function with terrible naming
 function doStuff1(){console.log("doing stuff!")}
 
-// Export but inconsistent naming
-module.exports = {processData, readAndProcess}
+// 6. New: mixing ES modules & CommonJS, dynamic require
+import os from 'os';
+const version = require('child_process').execSync('node -v');
+
+// 7. New: an old-style Promise with no catch
+function oldPromiseStyle(){
+    return new Promise((resolve, reject)=>{
+resolve("ok")
+})
+}
+
+// 8. New: a callback-based fetchData plus an unused var
+function fetchData(cb){
+  fs.readFile('data.txt', 'utf-8', (err, data) => {
+    if(err){
+      console.error("Error!", err)
+      return
+    }
+    cb(data)
+  })
+}
+let unusedVar = 42
+
+// 9. New: C-style for loop with var
+for(var i=0;i<3;i++){
+    console.log("Loop index:",i)
+}
+
+// 10. New: inconsistent trailing commas, semicolons & quotes
+const numbers = [1, 2, 3, 4,];
+const message = "Hello" + ' World';
+
+// 11. Mixed export syntax
+module.exports = {processData, readAndProcess, fetchData, oldPromiseStyle};
